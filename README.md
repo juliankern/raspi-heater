@@ -12,7 +12,13 @@ This is a NodeJS based software for raspberry pi to control my heater at home. M
 ## How it works
 Right now the software just activates a relay when the temperature gets too low. In theory it should be possible to extend it in order to support digital thermostats.
 
+## Requirements
+- NodeJS 6
+- MongoDB
+
 ## Setup
+- checkout this repository
+- run `npm install`
 - create environment config file: 
     - create new file `.env`
     - add the mongodb location like `MONGODB='localhost/heater'`
