@@ -1,0 +1,4 @@
+persist/
+.node-persist/
+node_modules/
+.env

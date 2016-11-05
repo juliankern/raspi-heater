@@ -1,0 +1,26 @@
+{
+  "name": "heater-control",
+  "version": "2.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://git.jukn.de/opensource/heater-control.git"
+  },
+  "author": "Julian kern <mail@juliankern.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^2.0.0",
+    "ds1820-temp": "^1.0.0",
+    "hap-nodejs": "github:khaost/HAP-NodeJS",
+    "lcd": "^1.1.4",
+    "lodash": "^4.16.4",
+    "moment": "^2.15.2",
+    "mongoose": "^4.6.4",
+    "node-persist": "^2.0.7",
+    "rpi-gpio": "^0.7.0"
+  }
+}

@@ -1,0 +1,202 @@
+{
+    "zone": 1,
+    "locale": "de",
+    "hardware": {
+        "sensor": "0000067bdac4",
+        "relay": 13,
+        "button": 15,
+        "display": 16,
+        "lcd": {
+            "rs": 12, 
+            "e": 21, 
+            "data": [5, 6, 17, 18]
+        }
+    },
+    "defaults": {
+        "home": 20,
+        "away": 18,
+        "holiday": 17
+    },
+    "days": [
+        {
+            "index": 0,
+            "day":"Sunday",
+            "times": [
+                {
+                    "time": "11:00",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "23:01",
+                    "temperatures": {
+                        "home": 16.5
+                    }
+                }
+            ]
+        }, {
+            "index": 1,
+            "times": [
+                {
+                    "time": "07:30",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "09:00",
+                    "temperatures": {
+                        "home": 18
+                    }
+                },
+                {
+                    "time": "16:00",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "23:02",
+                    "temperatures": {
+                        "home": 16.5,
+                        "away": 16.5
+                    }
+                }
+            ]
+        }, {
+            "index": 2,
+            "times": [
+                {
+                    "time": "07:30",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "09:00",
+                    "temperatures": {
+                        "home": 18
+                    }
+                },
+                {
+                    "time": "16:00",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "23:03",
+                    "temperatures": {
+                        "home": 16.5,
+                        "away": 16.5
+                    }
+                }
+            ]
+        }, {
+            "index": 3,
+            "times": [
+                {
+                    "time": "07:30",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "09:00",
+                    "temperatures": {
+                        "home": 18
+                    }
+                },
+                {
+                    "time": "16:00",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "23:04",
+                    "temperatures": {
+                        "home": 16.5,
+                        "away": 16.5
+                    }
+                }
+            ]
+        }, {
+            "index": 4,
+            "times": [
+                {
+                    "time": "07:30",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "09:00",
+                    "temperatures": {
+                        "home": 18
+                    }
+                },
+                {
+                    "time": "16:00",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "23:05",
+                    "temperatures": {
+                        "home": 16.5,
+                        "away": 16.5
+                    }
+                }
+            ]
+        }, {
+            "index": 5,
+            "times": [
+                {
+                    "time": "07:30",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "09:00",
+                    "temperatures": {
+                        "home": 18
+                    }
+                },
+                {
+                    "time": "15:00",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "23:59",
+                    "temperatures": {
+                        "home": 16.5,
+                        "away": 16.5
+                    }
+                }
+            ]
+        }, {
+            "index": 6,
+            "times": [
+                {
+                    "time": "10:30",
+                    "temperatures": {
+                        "home": 20
+                    }
+                },
+                {
+                    "time": "23:60",
+                    "temperatures": {
+                        "home": 16.5,
+                        "away": 16.5
+                    }
+                }
+            ]
+        }
+    ]
+}

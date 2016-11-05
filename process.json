@@ -1,0 +1,19 @@
+{
+    "apps" : [
+        {
+            "name"        : "Control Server",
+            "script"      : "./control.js",
+            "watch"       : true
+        },
+        {
+            "name"        : "HomeKit Server",
+            "script"      : "./homekit.js",
+            "watch"       : true
+        },
+        {
+            "name"        : "Display Server",
+            "script"      : "./display.js",
+            "watch"       : true
+        }
+    ]
+}
