@@ -1,5 +1,7 @@
 # raspi-heater
 
+![alt tag](https://scontent-cdg2-1.xx.fbcdn.net/v/t1.0-9/15037162_1795078934042037_8821929497397715503_n.jpg?oh=6ca9e55bb196442d704f732736c5ad31&oe=58C21348)
+
 This is a NodeJS based software for raspberry pi to control my heater at home. Maybe you'll find it useful for yourself.
 
 ## Features
