@@ -29,7 +29,7 @@
                     }
                 },
                 {
-                    "time": "23:01",
+                    "time": "23:00",
                     "temperatures": {
                         "home": 16.5
                     }
@@ -57,7 +57,7 @@
                     }
                 },
                 {
-                    "time": "23:02",
+                    "time": "23:00",
                     "temperatures": {
                         "home": 16.5,
                         "away": 16.5
@@ -86,7 +86,7 @@
                     }
                 },
                 {
-                    "time": "23:03",
+                    "time": "23:00",
                     "temperatures": {
                         "home": 16.5,
                         "away": 16.5
@@ -115,7 +115,7 @@
                     }
                 },
                 {
-                    "time": "23:04",
+                    "time": "23:00",
                     "temperatures": {
                         "home": 16.5,
                         "away": 16.5
@@ -144,7 +144,7 @@
                     }
                 },
                 {
-                    "time": "23:05",
+                    "time": "23:00",
                     "temperatures": {
                         "home": 16.5,
                         "away": 16.5
@@ -190,7 +190,7 @@
                     }
                 },
                 {
-                    "time": "23:60",
+                    "time": "23:59",
                     "temperatures": {
                         "home": 16.5,
                         "away": 16.5
