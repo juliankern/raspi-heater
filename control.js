@@ -160,7 +160,7 @@ function getCurrentConfig(now) {
     for (let day of cfg.days) {
         for(let time of day.times) {
             dateArray.push({ 
-                day: day.day,
+                day: moment().day(day.index).format('dddd'),
                 dayIndex: day.index,
                 time: time.time,
                 datetime: getMomentForTime(moment(), time.time).day(day.index)._d, 
@@ -169,7 +169,7 @@ function getCurrentConfig(now) {
         }
     }
 
-    dateArray.push({ datetime: moment()._d, now: true });
+    dateArray.push({ datetime: now._d, now: true });
 
     dateArray.sort((a, b) => {
         if (moment(a.datetime).unix() > moment(b.datetime).unix()) {
@@ -191,7 +191,7 @@ function getCurrentConfig(now) {
     foundTime = dateArray[foundIndex - 1];
 
     return { 
-        day: moment().day(foundTime.dayIndex).format('dddd'), 
+        day: foundTime.day, 
         dayIndex: foundTime.dayIndex,
         time: foundTime.time, 
         temperatures: _.extend(cfg.defaults, foundTime.temperatures) 

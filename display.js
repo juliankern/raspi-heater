@@ -10,6 +10,8 @@ var Zone = require('./models/zone.js');
 require('dotenv').load();
 var cfg = require('./config.json');
 
+// set the mongoose promise library to the nodejs one, required by mongoose now
+mongoose.Promise = global.Promise;
 // connect to the mongodb
 mongoose.connect(process.env.MONGODB);
 // output an error if the connection fails - kill the app
@@ -32,7 +34,7 @@ setInterval(function() {
             
             // chceck statuses by importance
             if (statuses.isHoliday && statuses.isHoliday.value === 'true') {
-                status = 'holi';
+                status = 'holiday';
             }
 
             // obviously the home-status if more important than the holiday status
@@ -46,10 +48,12 @@ setInterval(function() {
                 lines.push(
                     zone.currentTemperature.toFixed(1) +
                     'C > ' +
-                    zone.targetTemperature.toFixed(1) + 'C  ' + (statuses.heaterOn.value === 'true' ? '#': '')
+                    zone.targetTemperature.toFixed(1) + 'C  ' + (statuses.heaterOn.value === 'true' ? '#': ' ')
                 );
                 
-                lines.push(status);
+                // put the status in the second line, fill it up with spaces to prevent display bugs - no idea why they keep appearing
+                // - looking funny though
+                lines.push(_.padEnd(status, 16));
                 
                 // print those lines to the display
                 lcd.printLines(lines);
