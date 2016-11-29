@@ -7,13 +7,18 @@ var Zone = require('./models/zone.js');
 require('dotenv').load();
 var cfg = require('./config.json');
 
+// init the HAP-server
 HAP.init();
 var storage = require('node-persist');
 var uuid = HAP.uuid;
 var Accessory = HAP.Accessory;
 var accessoryLoader = require('hap-nodejs/lib/AccessoryLoader');
 
+// set the mongoose promise library to the nodejs one, required by mongoose now
+mongoose.Promise = global.Promise;
+// connect to the mongodb
 mongoose.connect(process.env.MONGODB);
+// output an error if the connection fails - kill the app
 mongoose.connection.on('error', function() {
     console.error('ERROR - MongoDB Connection Error. Please make sure that MongoDB is running.');
     process.exit(1);

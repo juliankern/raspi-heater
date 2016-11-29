@@ -14,32 +14,38 @@ var outlet = exports.accessory = new Accessory('Home Status', uuid.generate('hap
 outlet.username = "1A:2B:3C:4D:5D:FF";
 outlet.pincode = "031-45-154";
 
+// set the accessory information to some ultra fancy values
 outlet
     .getService(Service.AccessoryInformation)
     .setCharacteristic(Characteristic.Manufacturer, "Julian Kern")
     .setCharacteristic(Characteristic.Model, "Heater1")
     .setCharacteristic(Characteristic.SerialNumber, "A000000001");
 
+// add service for setting the status
 outlet
     .addService(Service.Outlet, "Home Status")
     .getCharacteristic(Characteristic.On)
     .on('set', function(value, callback) {
+        // update db if the status is changed
         Status.findOneAndUpdate({ key: 'isHome' }, { value: !!value }, { new: true, upsert: true })
         .exec((err, updated) => {
             callback();
         })
     });
     
+// add service for getting the value
 outlet
     .getService(Service.Outlet)
     .getCharacteristic(Characteristic.On)
     .on('get', function(callback) {
+        // just a simple output from the db
         Status.findOne({ key: 'isHome' })
         .exec((err, data) => {
             callback(err, (data ? data.value === 'true' : false));
         })
     }); 
 
+// yep, this "outlet" is always in use. no idea why this is a requirement
 outlet
     .getService(Service.Outlet)
     .setCharacteristic(Characteristic.OutletInUse, true);

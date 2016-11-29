@@ -14,12 +14,14 @@ var thermostat = exports.accessory = new Accessory('Thermostat', uuid.generate('
 thermostat.username = "C1:5D:3A:AE:5E:F3";
 thermostat.pincode = "031-45-154";
 
+// set the accessory information to some ultra fancy values
 thermostat
     .getService(Service.AccessoryInformation)
     .setCharacteristic(Characteristic.Manufacturer, "Julian Kern")
     .setCharacteristic(Characteristic.Model, "Heater1")
     .setCharacteristic(Characteristic.SerialNumber, "A000000004");
 
+// add a service for getting the current heating state 
 thermostat
     .addService(Service.Thermostat, 'Thermostat')
     .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
@@ -28,6 +30,8 @@ thermostat
             // return our current value
             var state;
             
+            // maybe i should find a more suitable solution here, but it works for now - it actually shows in homekit if the heater is turned on now
+            // - which isn't that bad, right?
             switch(data.value) {
                 case 'false': 
                     state = Characteristic.CurrentHeatingCoolingState.OFF;
@@ -43,6 +47,7 @@ thermostat
         });
     });
 
+// add a service forgetting the supposed heating state
 thermostat
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TargetHeatingCoolingState)
@@ -51,6 +56,7 @@ thermostat
             var state;
             data = data || { value : 0 };
             
+            // same as above, should be changed maybe
             switch(data.value) {
                 case '0': 
                     state = Characteristic.TargetHeatingCoolingState.OFF;
@@ -66,13 +72,18 @@ thermostat
         })
     });
 
+// add a service for changing the target state
 thermostat
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TargetHeatingCoolingState)
     .on('set', function(value, callback) {
+        // ignore state "2" which would be "cooling", and set to "auto" instead
         if (value === 2 || value === '2') value === 3;
+        // save the state
         Status.findOneAndUpdate({ key: 'heatingMode' }, { value: value }, { new: true, upsert: true }).exec((err, data) => {
             setTimeout(function() {
+                // reset the state to off after 15 minutes again -> 15 minutes of heating
+                // - the fun part is: we don't need to do more than setting it. the actual changes happens, because this one gets called again - and control.js sees the new status
                 thermostat
                 .getService(Service.Thermostat)
                 .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.OFF);
@@ -82,6 +93,7 @@ thermostat
         })
     });
 
+// check for the current temperature every 1min, and update homekit
 setInterval(function() {
     Zone.findOne({ number: cfg.zone }).exec((err, data) => {
         thermostat
@@ -90,34 +102,38 @@ setInterval(function() {
     });
 }, 1000*60);
 
+// add service for the current temperature
 thermostat
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.CurrentTemperature)
     .on('get', function(callback) {
         Zone.findOne({ number: cfg.zone }).exec((err, data) => {
-            // return our current value
+            // return our current value - simple output
             callback(null, data.currentTemperature);
         });
     });
 
+// add service for getting the target temperature
 thermostat
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TargetTemperature)
     .on('get', function(callback) {
         Zone.findOne({ number: cfg.zone }).exec((err, data) => {
-            // return our current value
+            // return our current value - simple output
             callback(null, data.targetTemperature);
         });
     });
 
+// add a service for setting the target temperature
 thermostat
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TargetTemperature)
     .on('set', function(value, callback) {
         Zone.findOneAndUpdate({ number: cfg.zone }, { targetTemperature: value }).exec((err, data) => {
-            // return our current value
+            // again some fun: this causes the timer to start again
             console.log('get: TargetTemperature', data.targetTemperature);
             Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 1 }, { new: true, upsert: true }).exec((err, data) => {
+                // actually THIS (v) does.
                 thermostat
                 .getService(Service.Thermostat)
                 .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.HEAT);
@@ -127,6 +143,7 @@ thermostat
         });
     });
 
+// add a "service" for getting the current units => defaults to celsius
 thermostat
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TemperatureDisplayUnits)
@@ -134,6 +151,7 @@ thermostat
         callback(null, Characteristic.TemperatureDisplayUnits.CELSIUS);
     });
 
+// add a service for changing the unit => nope. still celsius.
 thermostat
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TemperatureDisplayUnits)

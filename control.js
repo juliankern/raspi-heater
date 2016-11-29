@@ -16,8 +16,11 @@ var displayTimeout;
 require('dotenv').load();
 moment.locale(cfg.locale);
 
+// set the mongoose promise library to the nodejs one, required by mongoose now
 mongoose.Promise = global.Promise;
+// connect to the mongodb
 mongoose.connect(process.env.MONGODB);
+// output an error if the connection fails - kill the app
 mongoose.connection.on('error', function() {
     console.error('ERROR - MongoDB Connection Error. Please make sure that MongoDB is running.');
     process.exit(1);
@@ -28,7 +31,10 @@ mongoose.connection.on('error', function() {
 ////////////////
 
 //relay
-gpio.setup(cfg.hardware.relay, 'out');
+gpio.setup(cfg.hardware.relay, 'out').then((data) => { 
+    console.log('Pin relay setup!', data); 
+    gpio.setTrue(cfg.hardware.relay);
+});
 // backlight
 gpio.setup(cfg.hardware.display, 'out').then((data) => { 
     console.log('Pin display setup!', data); 
@@ -54,9 +60,11 @@ gpio.setup(cfg.hardware.button, 'in').then((data) => {
 // start loops and call them once //
 ////////////////////////////////////
 
+// first check after launch
 checkTemperatures();
 _set();
 
+// interval checks
 setInterval(checkTemperatures, 1000 * 30); // every 30s
 setInterval(_set, 1000 * 60); // every 1min
 
@@ -64,6 +72,7 @@ setInterval(_set, 1000 * 60); // every 1min
 // on kill //
 /////////////
 
+// reset all the pins, turn off the heater
 process.on('exit', (code) => {
     gpio.setFalse(cfg.hardware.display);
     gpio.setTrue(cfg.hardware.relay); 
@@ -73,17 +82,22 @@ process.on('exit', (code) => {
 // Methods //
 /////////////
 
+/**
+ * call for setting the current target temperature
+ */
 function _set() {
     setTargetTemperature(function(err, temp) {
         console.log('updated temp', err, temp);
     })
 }
 
+/**
+ * read the temperature from the sensor and save it - compare to target temperature and activate heater if necessary    
+ */
 function checkTemperatures() {
     sensor.read().then((temp) => {
         Zone.findOneAndUpdate({ number: cfg.zone }, { currentTemperature: temp }, { new: true, upsert: true })
         .exec((err, updated) => {
-            console.log('updated?', updated);
             var targetTemperature = updated && updated.targetTemperature ? updated.targetTemperature : cfg.defaults.away;
             var newStatus = roundTemperature(temp) < roundTemperature(targetTemperature);
             console.log('read & updated temp', temp, roundTemperature(temp), '=>', roundTemperature(targetTemperature));
@@ -93,10 +107,19 @@ function checkTemperatures() {
     });
 }
 
+/**
+ * helper function for rounding teperature - always to quarters
+ * @param  {number} value temperature
+ * @return {number}       rounded temperature
+ */
 function roundTemperature(value) {
     return Math.ceil(value * 4) / 4;
 }
 
+/**
+ * gets the current status and sets the target temperature accordingly
+ * @param {Function} cb callback after setting the target
+ */
 function setTargetTemperature(cb) {
     var status = 'away';
     Status.find({}).exec((err, statuses) => {
@@ -124,6 +147,11 @@ function setTargetTemperature(cb) {
     });
 }
 
+/**
+ * gets the current temperature set relative to current (or "now"-based-) time
+ * @param  {object} now moment.js Obj for setting the current time - if undefined use real now
+ * @return {object}     object containing data and the temperature set
+ */
 function getCurrentConfig(now) {
     now = now || moment();
     var dateArray = [];
@@ -170,6 +198,12 @@ function getCurrentConfig(now) {
     };
 }
 
+/**
+ * helper function for getting the moment() object for a time string
+ * @param  {object} now  moment.js object
+ * @param  {string} time time string
+ * @return {object}      moment.js object
+ */
 function getMomentForTime(now, time) {
     if (!time) return false;
     time = time.split(':');
