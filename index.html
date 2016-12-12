@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Raspi-heater by juliankern</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Raspi-heater</h1>
+        <h2>Very basic heater control, made with NodeJS and MongoDB for raspberry pi</h2>
+        <a href="https://github.com/juliankern/raspi-heater" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="raspi-heater" class="anchor" href="#raspi-heater" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>raspi-heater</h1>
+
+<p><img src="https://scontent-cdg2-1.xx.fbcdn.net/v/t1.0-9/15037162_1795078934042037_8821929497397715503_n.jpg?oh=6ca9e55bb196442d704f732736c5ad31&amp;oe=58C21348" alt="alt tag"></p>
+
+<p>This is a NodeJS based software for raspberry pi to control my heater at home. Maybe you'll find it useful for yourself.</p>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Time and location based temperature: at home, away, or away for holidays</li>
+<li>Interrupt the automatic setup for 15 minutes heating</li>
+<li>control via iOS 10 HomeKit</li>
+<li>Display the current status on a connected LCD display</li>
+</ul>
+
+<h2>
+<a id="how-it-works" class="anchor" href="#how-it-works" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How it works</h2>
+
+<p>Right now the software just activates a relay when the temperature gets too low. In theory it should be possible to extend it in order to support digital thermostats.</p>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ul>
+<li>NodeJS 6</li>
+<li>MongoDB</li>
+</ul>
+
+<h2>
+<a id="setup" class="anchor" href="#setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup</h2>
+
+<ul>
+<li>checkout this repository</li>
+<li>run <code>npm install</code>
+</li>
+<li>create environment config file: 
+
+<ul>
+<li>create new file <code>.env</code>
+</li>
+<li>add the mongodb location like <code>MONGODB='localhost/heater'</code>
+</li>
+<li>you can use both a local mongodb and a server based, although i noticed that the latency is likely too high to support a proper control</li>
+</ul>
+</li>
+<li>Adjust <code>config.json</code> to your needs: 
+
+<ul>
+<li>Change the GPIO ports to your ones and your sensor name</li>
+<li>Change the desired days, times and temperatures - if no temerature is set for a status, the default temperatures will be used</li>
+<li>Change the locale</li>
+<li>If you want to use multiple raspi-heaters with the same database, give each one a different zone id</li>
+</ul>
+</li>
+<li>start the processes you need:
+
+<ul>
+<li>
+<code>control.js</code> for the general controller</li>
+<li>
+<code>homekit.js</code> for homekit support</li>
+<li>
+<code>display.js</code> if you've connected a display</li>
+<li>you can start all three with the pm2 process manager with the added process.json</li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="future-features" class="anchor" href="#future-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Future features</h2>
+
+<ul>
+<li>browser interface
+
+<ul>
+<li>server based, with own database and replication</li>
+</ul>
+</li>
+<li>real support for multiple instances in the same home network</li>
+</ul>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/juliankern/raspi-heater/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/juliankern/raspi-heater/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/juliankern/raspi-heater"></a> is maintained by <a href="https://github.com/juliankern">juliankern</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
