@@ -9,9 +9,9 @@ var uuid = HAP.uuid;
 var Zone = require('../models/zone.js');
 var Status = require('../models/status.js');
 
-var thermostat = exports.accessory = new Accessory('Thermostat', uuid.generate('hap-nodejs:accessories:thermostat'));
+var thermostat = exports.accessory = new Accessory('Thermostat5', uuid.generate('hap-nodejs:accessories:thermostat'));
 
-thermostat.username = "C1:5D:3A:AE:5E:F3";
+thermostat.username = "A1:5D:3A:AE:5A:F1";
 thermostat.pincode = "031-45-154";
 
 // set the accessory information to some ultra fancy values
@@ -19,8 +19,14 @@ thermostat
     .getService(Service.AccessoryInformation)
     .setCharacteristic(Characteristic.Manufacturer, "Julian Kern")
     .setCharacteristic(Characteristic.Model, "Heater1")
-    .setCharacteristic(Characteristic.SerialNumber, "A000000004");
+    .setCharacteristic(Characteristic.SerialNumber, "A000000012");
 
+thermostat
+    .on('identify', (paired, callback) => {
+        console.log('Identifying Thermostat - paired:', paired);
+        callback();
+    }); 
+    
 // add a service for getting the current heating state 
 thermostat
     .addService(Service.Thermostat, 'Thermostat')
@@ -28,21 +34,25 @@ thermostat
     .on('get', function(callback) {
         Status.findOne({ key: 'heaterOn' }).exec((err, data) => {
             // return our current value
-            var state;
+            var state, stateName;
             
             // maybe i should find a more suitable solution here, but it works for now - it actually shows in homekit if the heater is turned on now
             // - which isn't that bad, right?
             switch(data.value) {
                 case 'false': 
+                    stateName = 'off';
                     state = Characteristic.CurrentHeatingCoolingState.OFF;
                     break;
                 case 'true':
+                    stateName = 'heat';
                     state = Characteristic.CurrentHeatingCoolingState.HEAT;
                     break;
                 default:
+                    stateName = 'off';
                     state = Characteristic.CurrentHeatingCoolingState.OFF;                
             }
             
+            console.log('get: CurrentHeatingCoolingState', stateName, data.value);
             callback(null, state);
         });
     });
@@ -53,21 +63,25 @@ thermostat
     .getCharacteristic(Characteristic.TargetHeatingCoolingState)
     .on('get', function(callback) {
         Status.findOne({ key: 'heatingMode' }).exec((err, data) => {
-            var state;
-            data = data || { value : 0 };
+            var state, stateName;
+            data = data || { value : 0 };
             
             // same as above, should be changed maybe
             switch(data.value) {
                 case '0': 
+                    stateName = 'off';
                     state = Characteristic.TargetHeatingCoolingState.OFF;
                     break;
                 case '1':
+                    stateName = 'heat';
                     state = Characteristic.TargetHeatingCoolingState.HEAT;
                     break;
                 default:
+                    stateName = 'auto';
                     state = Characteristic.TargetHeatingCoolingState.AUTO;                
             }
             
+            console.log('get: TargetHeatingCoolingState', stateName, data.value);
             callback(null, state);
         })
     });
@@ -87,8 +101,9 @@ thermostat
                 thermostat
                 .getService(Service.Thermostat)
                 .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.OFF);
-            }, 1000 * 60 * 15)
+            }, 1000 * 60 * 60)
             
+            console.log('set: TargetHeatingCoolingState', value);
             callback();
         })
     });
@@ -109,6 +124,7 @@ thermostat
     .on('get', function(callback) {
         Zone.findOne({ number: cfg.zone }).exec((err, data) => {
             // return our current value - simple output
+            console.log('get: CurrentTemperature', data.currentTemperature);
             callback(null, data.currentTemperature);
         });
     });
@@ -120,6 +136,7 @@ thermostat
     .on('get', function(callback) {
         Zone.findOne({ number: cfg.zone }).exec((err, data) => {
             // return our current value - simple output
+            console.log('get: TargetTemperature', data.targetTemperature);
             callback(null, data.targetTemperature);
         });
     });
@@ -131,14 +148,16 @@ thermostat
     .on('set', function(value, callback) {
         Zone.findOneAndUpdate({ number: cfg.zone }, { targetTemperature: value }).exec((err, data) => {
             // again some fun: this causes the timer to start again
-            console.log('get: TargetTemperature', data.targetTemperature);
+            console.log('set: TargetTemperature', data.targetTemperature);
             Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 1 }, { new: true, upsert: true }).exec((err, data) => {
-                // actually THIS (v) does.
-                thermostat
-                .getService(Service.Thermostat)
-                .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.HEAT);
+                Zone.findOneAndUpdate({ number: cfg.zone }, { customTemperature: value }).exec((err, data) => {
+                    // actually THIS (v) does.
+                    thermostat
+                    .getService(Service.Thermostat)
+                    .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.HEAT);
 
-                callback();
+                    callback();
+                });
             })
         });
     });
@@ -155,6 +174,6 @@ thermostat
 thermostat
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TemperatureDisplayUnits)
-    .on('set', function(callback) {
+    .on('set', function(value, callback) {
         callback();
-    });
+    });  

@@ -32,18 +32,18 @@ mongoose.connection.on('error', function() {
 
 //relay
 gpio.setup(cfg.hardware.relay, 'out').then((data) => { 
-    console.log('Pin relay setup!', data); 
+    console.log('SETUP Pin relay!', data); 
     gpio.setTrue(cfg.hardware.relay);
 });
 // backlight
 gpio.setup(cfg.hardware.display, 'out').then((data) => { 
-    console.log('Pin display setup!', data); 
+    console.log('SETUP Pin display!', data); 
     gpio.setFalse(cfg.hardware.display);
 });
 
 // button
 gpio.setup(cfg.hardware.button, 'in').then((data) => { 
-    console.log('Pin button setup!', data); 
+    console.log('SETUP Pin button!', data); 
     gpio.gpio.on('change', function(channel, value) {
         if (channel === cfg.hardware.button && value) {
             if (displayTimeout) clearTimeout(displayTimeout);
@@ -87,7 +87,7 @@ process.on('exit', (code) => {
  */
 function _set() {
     setTargetTemperature(function(err, temp) {
-        console.log('updated temp', err, temp);
+        console.log('CONTROL: updated temp', err, { number: temp.number, current: temp.currentTemperature, target: temp.targetTemperature });
     })
 }
 
@@ -100,7 +100,7 @@ function checkTemperatures() {
         .exec((err, updated) => {
             var targetTemperature = updated && updated.targetTemperature ? updated.targetTemperature : cfg.defaults.away;
             var newStatus = roundTemperature(temp) < roundTemperature(targetTemperature);
-            console.log('read & updated temp', temp, roundTemperature(temp), '=>', roundTemperature(targetTemperature));
+            console.log('CONTROL: read & updated temp', temp, roundTemperature(temp), '=>', roundTemperature(targetTemperature));
 
             heater.toggle(newStatus);
         });
@@ -135,14 +135,19 @@ function setTargetTemperature(cb) {
                 status = 'home';
             }
             
-            var temperature = getCurrentConfig().temperatures[status];
-            
-            if (statuses.heatingMode && statuses.heatingMode.value === '1') {
-                temperature = 88;
-            }
-            console.log('current config', getCurrentConfig(), status, temperature);
+            getCurrentConfig().then((data) => {
+                if (statuses.heatingMode && statuses.heatingMode.value === '1') {
+                    status = 'timer';
+                }
+                
+                var temperature = data.temperatures[status];
+                
+                console.log('CONTROL current config', data, status, temperature);
 
-            Zone.findOneAndUpdate({ number: cfg.zone }, { targetTemperature: temperature }).exec(cb)
+                Zone.findOneAndUpdate({ number: cfg.zone }, { targetTemperature: temperature })
+                    .select('number currentTemperature targetTemperature')
+                    .exec(cb);
+            });
         }
     });
 }
@@ -190,12 +195,15 @@ function getCurrentConfig(now) {
     foundIndex = foundIndex === 0 ? dateArray.length : foundIndex;
     foundTime = dateArray[foundIndex - 1];
 
-    return { 
-        day: foundTime.day, 
-        dayIndex: foundTime.dayIndex,
-        time: foundTime.time, 
-        temperatures: _.extend(cfg.defaults, foundTime.temperatures) 
-    };
+    return Zone.findOne({ number: cfg.zone })
+        .then((data) => {
+            return { 
+                day: foundTime.day, 
+                dayIndex: foundTime.dayIndex,
+                time: foundTime.time, 
+                temperatures: _.extend(cfg.defaults, foundTime.temperatures, { timer: data.customTemperature }) 
+            };
+        });
 }
 
 /**
