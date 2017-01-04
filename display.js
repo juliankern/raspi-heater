@@ -56,6 +56,7 @@ setInterval(function() {
                 lines.push(_.padEnd(status, 16));
                 
                 // print those lines to the display
+                lcd.clear();
                 lcd.printLines(lines);
                 
                 // debug output

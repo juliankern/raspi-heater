@@ -61,8 +61,10 @@ gpio.setup(cfg.hardware.button, 'in').then((data) => {
 ////////////////////////////////////
 
 // first check after launch
-checkTemperatures();
-_set();
+Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 0 }, { new: true, upsert: true }).exec((err, data) => {
+    checkTemperatures();
+    _set();
+});
 
 // interval checks
 setInterval(checkTemperatures, 1000 * 30); // every 30s
@@ -87,7 +89,7 @@ process.on('exit', (code) => {
  */
 function _set() {
     setTargetTemperature(function(err, temp) {
-        console.log('CONTROL: updated temp', err, { number: temp.number, current: temp.currentTemperature, target: temp.targetTemperature });
+        console.log('CONTROL updated temp', err, { number: temp.number, current: temp.currentTemperature, target: temp.targetTemperature });
     })
 }
 
@@ -100,7 +102,7 @@ function checkTemperatures() {
         .exec((err, updated) => {
             var targetTemperature = updated && updated.targetTemperature ? updated.targetTemperature : cfg.defaults.away;
             var newStatus = roundTemperature(temp) < roundTemperature(targetTemperature);
-            console.log('CONTROL: read & updated temp', temp, roundTemperature(temp), '=>', roundTemperature(targetTemperature));
+            console.log('CONTROL read & updated temp - current:', temp, ' (rounded:', roundTemperature(temp), ') => target:', roundTemperature(targetTemperature));
 
             heater.toggle(newStatus);
         });
@@ -142,7 +144,9 @@ function setTargetTemperature(cb) {
                 
                 var temperature = data.temperatures[status];
                 
-                console.log('CONTROL current config', data, status, temperature);
+                console.log('CONTROL current config:', data);
+                console.log('CONTROL current status:', status);
+                console.log('CONTROL found temperature:', temperature);
 
                 Zone.findOneAndUpdate({ number: cfg.zone }, { targetTemperature: temperature })
                     .select('number currentTemperature targetTemperature')
