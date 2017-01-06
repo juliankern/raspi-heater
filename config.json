@@ -37,21 +37,10 @@
             ]
         }, {
             "index": 1,
+            "day":"Monday",
             "times": [
                 {
                     "time": "07:30",
-                    "temperatures": {
-                        "home": 20
-                    }
-                },
-                {
-                    "time": "09:00",
-                    "temperatures": {
-                        "home": 18
-                    }
-                },
-                {
-                    "time": "16:00",
                     "temperatures": {
                         "home": 20
                     }
@@ -66,21 +55,10 @@
             ]
         }, {
             "index": 2,
+            "day":"Tuesday",
             "times": [
                 {
                     "time": "07:30",
-                    "temperatures": {
-                        "home": 20
-                    }
-                },
-                {
-                    "time": "09:00",
-                    "temperatures": {
-                        "home": 18
-                    }
-                },
-                {
-                    "time": "16:00",
                     "temperatures": {
                         "home": 20
                     }
@@ -95,21 +73,10 @@
             ]
         }, {
             "index": 3,
+            "day":"Wednesday",
             "times": [
                 {
                     "time": "07:30",
-                    "temperatures": {
-                        "home": 20
-                    }
-                },
-                {
-                    "time": "09:00",
-                    "temperatures": {
-                        "home": 18
-                    }
-                },
-                {
-                    "time": "16:00",
                     "temperatures": {
                         "home": 20
                     }
@@ -124,21 +91,10 @@
             ]
         }, {
             "index": 4,
+            "day":"thursday",
             "times": [
                 {
                     "time": "07:30",
-                    "temperatures": {
-                        "home": 20
-                    }
-                },
-                {
-                    "time": "09:00",
-                    "temperatures": {
-                        "home": 18
-                    }
-                },
-                {
-                    "time": "16:00",
                     "temperatures": {
                         "home": 20
                     }
@@ -153,21 +109,10 @@
             ]
         }, {
             "index": 5,
+            "day":"Friday",
             "times": [
                 {
                     "time": "07:30",
-                    "temperatures": {
-                        "home": 20
-                    }
-                },
-                {
-                    "time": "09:00",
-                    "temperatures": {
-                        "home": 18
-                    }
-                },
-                {
-                    "time": "15:00",
                     "temperatures": {
                         "home": 20
                     }
@@ -182,6 +127,7 @@
             ]
         }, {
             "index": 6,
+            "day":"Saturday",
             "times": [
                 {
                     "time": "10:30",
