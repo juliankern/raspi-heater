@@ -31,7 +31,7 @@
                 {
                     "time": "23:00",
                     "temperatures": {
-                        "home": 16.5
+                        "home": 17
                     }
                 }
             ]
@@ -48,8 +48,8 @@
                 {
                     "time": "23:00",
                     "temperatures": {
-                        "home": 16.5,
-                        "away": 16.5
+                        "home": 17,
+                        "away": 17
                     }
                 }
             ]
@@ -66,8 +66,8 @@
                 {
                     "time": "23:00",
                     "temperatures": {
-                        "home": 16.5,
-                        "away": 16.5
+                        "home": 17,
+                        "away": 17
                     }
                 }
             ]
@@ -84,8 +84,8 @@
                 {
                     "time": "23:00",
                     "temperatures": {
-                        "home": 16.5,
-                        "away": 16.5
+                        "home": 17,
+                        "away": 17
                     }
                 }
             ]
@@ -102,8 +102,8 @@
                 {
                     "time": "23:00",
                     "temperatures": {
-                        "home": 16.5,
-                        "away": 16.5
+                        "home": 17,
+                        "away": 17
                     }
                 }
             ]
@@ -120,8 +120,8 @@
                 {
                     "time": "23:59",
                     "temperatures": {
-                        "home": 16.5,
-                        "away": 16.5
+                        "home": 17,
+                        "away": 17
                     }
                 }
             ]
@@ -138,8 +138,8 @@
                 {
                     "time": "23:59",
                     "temperatures": {
-                        "home": 16.5,
-                        "away": 16.5
+                        "home": 17,
+                        "away": 17
                     }
                 }
             ]

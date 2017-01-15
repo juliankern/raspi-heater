@@ -101,7 +101,7 @@ thermostat
                 thermostat
                 .getService(Service.Thermostat)
                 .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.OFF);
-            }, 1000 * 60 * 60)
+            }, 1000 * 60 * 60) // 1h
             
             console.log('set: TargetHeatingCoolingState', value);
             callback();
