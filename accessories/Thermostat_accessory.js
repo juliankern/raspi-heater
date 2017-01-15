@@ -9,9 +9,9 @@ var uuid = HAP.uuid;
 var Zone = require('../models/zone.js');
 var Status = require('../models/status.js');
 
-var thermostat = exports.accessory = new Accessory('Thermostat5', uuid.generate('hap-nodejs:accessories:thermostat'));
+var thermostat = exports.accessory = new Accessory('Thermostat', uuid.generate('hap-nodejs:accessories:thermostat'));
 
-thermostat.username = "A1:5D:3A:AE:5A:F1";
+thermostat.username = "C1:5D:3A:AE:5E:F3";
 thermostat.pincode = "031-45-154";
 
 // set the accessory information to some ultra fancy values
@@ -19,7 +19,7 @@ thermostat
     .getService(Service.AccessoryInformation)
     .setCharacteristic(Characteristic.Manufacturer, "Julian Kern")
     .setCharacteristic(Characteristic.Model, "Heater1")
-    .setCharacteristic(Characteristic.SerialNumber, "A000000012");
+    .setCharacteristic(Characteristic.SerialNumber, "A000000004");
 
 thermostat
     .on('identify', (paired, callback) => {
