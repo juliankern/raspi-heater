@@ -97,9 +97,8 @@ function _set() {
  * read the temperature from the sensor and save it - compare to target temperature and activate heater if necessary    
  */
 function checkTemperatures() {
-    sensor.read().then((temp) => {
-        Zone.findOneAndUpdate({ number: cfg.zone }, { currentTemperature: temp }, { new: true, upsert: true })
-        .exec((err, updated) => {
+    getCurrentTemperature((temp) => {
+        updateCurrentTemperature(temp, (err, updated) => {
             var targetTemperature = updated && updated.targetTemperature ? updated.targetTemperature : cfg.defaults.away;
             var newStatus = roundTemperature(temp) < roundTemperature(targetTemperature);
             console.log('CONTROL read & updated temp - current:', temp, ' (rounded:', roundTemperature(temp), ') => target:', roundTemperature(targetTemperature));
@@ -154,6 +153,18 @@ function setTargetTemperature(cb) {
             });
         }
     });
+}
+
+function updateCurrentTemperature(temp, cb) {
+    Zone.findOneAndUpdate(
+            { number: cfg.zone }, 
+            { currentTemperature: temp }, 
+            { new: true, upsert: true }
+        ).exec(cb);
+}
+
+function getCurrentTemperature(cb) {
+    sensor.read().then(cb);
 }
 
 /**
