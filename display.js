@@ -15,18 +15,26 @@ mongoose.Promise = global.Promise;
 // connect to the mongodb
 mongoose.connect(process.env.MONGODB);
 // output an error if the connection fails - kill the app
-mongoose.connection.on('error', function() {
+mongoose.connection.on('error', () => {
     console.error('ERROR - MongoDB Connection Error. Please make sure that MongoDB is running.');
     process.exit(1);
 });
 
-// update display every 30s now
-setInterval(function() {
+lcd.on('ready', () => {
+    console.log('LCD READY!!');
+});
+
+// update display every 10s now
+setInterval(updateDisplay, 1000 * 10);
+
+function updateDisplay() {
+    console.log('update display....');
     status = 'away';
     lines = [];
 
     // get the current statuses
     Status.find({}).exec((err, statuses) => {
+        console.log('...get the current status...');
         if (err) { console.error(err); cb(err); } 
         else {
             // get statuses by key
@@ -41,9 +49,14 @@ setInterval(function() {
             if (statuses.isHome && statuses.isHome.value === 'true') {
                 status = 'home';
             }
+            
+            console.log('...current status:', status);
+            console.log('...get temperatures...');
 
             // get current temperatures for display
             Zone.findOne({ number: cfg.zone }).exec((err, zone) => {
+                console.log('...got temperatures!');
+                
                 // set the first line
                 lines.push(
                     zone.currentTemperature.toFixed(1) +
@@ -56,12 +69,34 @@ setInterval(function() {
                 lines.push(_.padEnd(status, 16));
                 
                 // print those lines to the display
-                lcd.clear();
-                lcd.printLines(lines);
+                lcd.clear((err) => {
+                    if (err) {
+                        throw err;
+                    }
                 
-                // debug output
-                console.log('print lines:', lines);
+                    lcd.printLines(lines).then(() => {
+                        console.log('DISPLAY printed all lines');
+                    });
+                    // debug output
+                    console.log('print lines:', lines);
+                });
             });
         }
     });
-}, 1000 * 30);
+}    
+
+function hex2String(input) {
+    // split input into groups of two
+    var hex = input.match(/[\s\S]{2}/g) || [];
+    var output = '';
+
+    // build a hex-encoded representation of your string
+    for (var i = 0, j = hex.length; i < j; i++) {
+        output += '%' + ('0' + hex[i]).slice(-2);
+    }
+
+    // decode it using this trick
+    output = decodeURIComponent(output);
+
+    return output;
+}
