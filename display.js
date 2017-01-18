@@ -1,5 +1,6 @@
 var status, lines;
 var mongoose = require('mongoose');
+var moment = require('moment');
 var _ = require('lodash');
 
 var lcd = require('./lib/lcd.js');
@@ -9,6 +10,10 @@ var Zone = require('./models/zone.js');
 
 require('dotenv').load();
 var cfg = require('./config.json');
+
+function clog(txt) {
+    console.log('[' + moment().format('YYYY-MM-DD HH:mm:ss') + ']', txt);
+}
 
 // set the mongoose promise library to the nodejs one, required by mongoose now
 mongoose.Promise = global.Promise;
@@ -21,20 +26,20 @@ mongoose.connection.on('error', () => {
 });
 
 lcd.on('ready', () => {
-    console.log('LCD READY!!');
+    clog('LCD READY!!');
 });
 
 // update display every 10s now
 setInterval(updateDisplay, 1000 * 10);
 
 function updateDisplay() {
-    console.log('update display....');
+    clog('update display....');
     status = 'away';
     lines = [];
 
     // get the current statuses
     Status.find({}).exec((err, statuses) => {
-        console.log('...get the current status...');
+        clog('...get the current status...');
         if (err) { console.error(err); cb(err); } 
         else {
             // get statuses by key
@@ -50,12 +55,12 @@ function updateDisplay() {
                 status = 'home';
             }
             
-            console.log('...current status:', status);
-            console.log('...get temperatures...');
+            clog('...current status:', status);
+            clog('...get temperatures...');
 
             // get current temperatures for display
             Zone.findOne({ number: cfg.zone }).exec((err, zone) => {
-                console.log('...got temperatures!');
+                clog('...got temperatures!');
                 
                 // set the first line
                 lines.push(
@@ -75,10 +80,10 @@ function updateDisplay() {
                     }
                 
                     lcd.printLines(lines).then(() => {
-                        console.log('DISPLAY printed all lines');
+                        clog('DISPLAY printed all lines');
                     });
                     // debug output
-                    console.log('print lines:', lines);
+                    clog('print lines:', lines);
                 });
             });
         }
