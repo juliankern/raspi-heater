@@ -1,4 +1,5 @@
 var HAP = require('hap-nodejs');
+var app = require('../lib/global');
 var cfg = require('../config.json');
 
 var Accessory = HAP.Accessory;
@@ -23,7 +24,7 @@ thermostat
 
 thermostat
     .on('identify', (paired, callback) => {
-        console.log('Identifying Thermostat - paired:', paired);
+        app.log('Identifying Thermostat - paired:', paired);
         callback();
     }); 
     
@@ -52,7 +53,7 @@ thermostat
                     state = Characteristic.CurrentHeatingCoolingState.OFF;                
             }
             
-            console.log('get: CurrentHeatingCoolingState', stateName, data.value);
+            app.log('get: CurrentHeatingCoolingState', stateName, data.value);
             callback(null, state);
         });
     });
@@ -81,7 +82,7 @@ thermostat
                     state = Characteristic.TargetHeatingCoolingState.AUTO;                
             }
             
-            console.log('get: TargetHeatingCoolingState', stateName, data.value);
+            app.log('get: TargetHeatingCoolingState', stateName, data.value);
             callback(null, state);
         })
     });
@@ -103,7 +104,7 @@ thermostat
                 .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.OFF);
             }, 1000 * 60 * 60) // 1h
             
-            console.log('set: TargetHeatingCoolingState', value);
+            app.log('set: TargetHeatingCoolingState', value);
             callback();
         })
     });
@@ -124,7 +125,7 @@ thermostat
     .on('get', function(callback) {
         Zone.findOne({ number: cfg.zone }).exec((err, data) => {
             // return our current value - simple output
-            console.log('get: CurrentTemperature', data.currentTemperature);
+            app.log('get: CurrentTemperature', data.currentTemperature);
             callback(null, data.currentTemperature);
         });
     });
@@ -136,7 +137,7 @@ thermostat
     .on('get', function(callback) {
         Zone.findOne({ number: cfg.zone }).exec((err, data) => {
             // return our current value - simple output
-            console.log('get: TargetTemperature', data.targetTemperature);
+            app.log('get: TargetTemperature', data.targetTemperature);
             callback(null, data.targetTemperature);
         });
     });
@@ -148,7 +149,7 @@ thermostat
     .on('set', function(value, callback) {
         Zone.findOneAndUpdate({ number: cfg.zone }, { targetTemperature: value }).exec((err, data) => {
             // again some fun: this causes the timer to start again
-            console.log('set: TargetTemperature', data.targetTemperature);
+            app.log('set: TargetTemperature', data.targetTemperature);
             Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 1 }, { new: true, upsert: true }).exec((err, data) => {
                 Zone.findOneAndUpdate({ number: cfg.zone }, { customTemperature: value }).exec((err, data) => {
                     // actually THIS (v) does.

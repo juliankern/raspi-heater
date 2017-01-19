@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var path = require('path');
 var HAP = require('hap-nodejs');
 
+var app = require('./lib/global');
 var Zone = require('./models/zone.js');
 
 require('dotenv').load();
@@ -34,7 +35,7 @@ var targetPort = 51826;
 var dir = path.join(__dirname, "accessories");
 var accessories = accessoryLoader.loadDirectory(dir);
 
-console.log("HAP-NodeJS starting...");
+app.log("HAP-NodeJS starting...");
 // Publish them all separately (as opposed to BridgedCore which publishes them behind a single Bridge accessory)
 accessories.forEach(function(accessory) {
 
@@ -47,7 +48,7 @@ accessories.forEach(function(accessory) {
         throw new Error("Pincode not found on accessory '" + accessory.displayName +
             "'. Core.js requires all accessories to define a 'pincode' property.");
 
-    // console.log('test', accessory.services[0].characteristics);
+    // app.log('test', accessory.services[0].characteristics);
     // publish this Accessory on the local network
     accessory.publish({
         port: targetPort++,
@@ -55,6 +56,6 @@ accessories.forEach(function(accessory) {
         pincode: accessory.pincode
     });
 
-    console.log('Accessory published!', accessory.displayName, accessory.pincode)
+    app.log('Accessory published!', accessory.displayName, accessory.pincode)
 });
 
