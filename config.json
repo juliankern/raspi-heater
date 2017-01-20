@@ -12,10 +12,12 @@
             "data": [5, 6, 17, 18]
         }
     },
+    "manualModeDuration": 120,
     "defaults": {
         "home": 20,
         "away": 18,
-        "holiday": 17
+        "holiday": 17,
+        "manual": 20
     },
     "days": [
         {

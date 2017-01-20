@@ -1,17 +1,13 @@
-var cfg = require('./config.json');
-var _ = require('lodash');
+var cfg = require('../config.json');
 var mongoose = require('mongoose');
 var moment = require('moment');
 
-var gpio = require('./lib/gpio_wrapper');
+var gpio = require('../lib/gpio_wrapper');
 
-var sensor = require('./lib/sensor.js');
-var heater = require('./controller/heater.js');
+var heater = require('../controller/heater.js');
+var app = require('../controller/app.js');
 
-var Zone = require('./models/zone.js');
-var Status = require('./models/status.js');
-
-var app = require('./lib/global');
+var Status = require('../models/status.js');
 
 var displayTimeout;
 
@@ -63,7 +59,7 @@ gpio.setup(cfg.hardware.button, 'in').then((data) => {
 ////////////////////////////////////
 
 // first check after launch
-Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 0 }, { new: true, upsert: true }).exec((err, data) => {
+Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 'auto' }, { new: true, upsert: true }).exec((err, data) => {
     checkTemperatures();
     _set();
 });

@@ -1,3 +1,5 @@
+var app = require('../controller/app.js');
+
 var Status = require('../models/status.js');
 var heater = require('../lib/heater.js');
 
@@ -20,7 +22,7 @@ module.exports = (function() {
         Status.findOne({ 'key': 'heaterOn' }).select('key value').exec((err, oldStatus) => {
             var newSetting = false;
 
-            console.log('HEATER: old status:', oldStatus.value);
+            app.log('HEATER: old status:', oldStatus.value);
             
             if (!oldStatus && typeof oldStatus.value !== 'string') {
                 newSetting = true;
@@ -30,10 +32,10 @@ module.exports = (function() {
                 });
             } 
             
-            console.log('HEATER new heater status?:', state);
+            app.log('HEATER new heater status?:', state);
             
             if (state !== (oldStatus.value === 'true') || newSetting) {
-                console.log('HEATER really toggle heater!');
+                app.log('HEATER really toggle heater!');
                 
                 oldStatus.value = state;
                 oldStatus.save((err, status) => {

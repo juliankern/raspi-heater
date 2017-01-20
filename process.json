@@ -2,17 +2,17 @@
     "apps" : [
         {
             "name"        : "Control Server",
-            "script"      : "./control.js",
+            "script"      : "./bin/control.js",
             "watch"       : true
         },
         {
             "name"        : "HomeKit Server",
-            "script"      : "./homekit.js",
+            "script"      : "./bin/homekit.js",
             "watch"       : true
         },
         {
             "name"        : "Display Server",
-            "script"      : "./display.js",
+            "script"      : "./bin/display.js",
             "watch"       : true
         }
     ]
