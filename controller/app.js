@@ -23,12 +23,14 @@ function getCurrentStatus(cb) {
             }
             
             _getCurrentConfig(null, statuses.heatingMode).then((data) => {
-                if (data.manual) {
+                // manual mode may be globally active, but not in this zone
+                // => use the actual status if not
+                // => maybe not the best solution, but the best way for my own heater setup
+                if (data.manual && data.temperatures['manual']) {
                     status = 'manual';
                 }
 
                 clog('CONTROL current data:', data);
-                
                 clog('CONTROL current status:', status);
                 
                 cb(status, data, statuses); 
@@ -160,13 +162,12 @@ function _getCurrentConfig(now, heatingMode) {
 
     return Zone.findOne({ number: cfg.zone }).then((zoneData) => {
         if (foundTime.manual && now.diff(moment(foundTime.datetime), 'minutes') < cfg.manualModeDuration) {
-            // manual mode is not overwritten AND not older than config (120min) and not older than two hours
+            // manual mode is not overwritten by config AND not older than config (120min) 
             
             return { 
                 manual: true,
-                temperatures: { manual: zoneData.customTemperature || cfg.defaults.manual }
-            };
-
+                temperatures: { manual: zoneData.customTemperature || 20 }
+            }
         } else if (manualMode) {
             // manualMode tryes to be still active, although it already too old
             // => reset it
@@ -180,8 +181,8 @@ function _getCurrentConfig(now, heatingMode) {
             day: foundTime.day, 
             dayIndex: foundTime.dayIndex,
             time: foundTime.time, 
-            temperatures: _.extend(cfg.defaults, foundTime.temperatures) 
-        };
+            temperatures: _.extend(cfg.defaultTemperatures, foundTime.temperatures) 
+        }
     })
 
 }

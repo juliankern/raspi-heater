@@ -13,11 +13,10 @@
         }
     },
     "manualModeDuration": 120,
-    "defaults": {
+    "defaultTemperatures": {
         "home": 20,
         "away": 18,
-        "holiday": 17,
-        "manual": 20
+        "holiday": 17
     },
     "days": [
         {
