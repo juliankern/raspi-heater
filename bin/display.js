@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var moment = require('moment');
 var _ = require('lodash');
 
-var lcd = require('../lib/lcd.js');
+var lcd;
 var app = require('../controller/app.js');
 
 var Status = require('../models/status.js');
@@ -22,12 +22,21 @@ mongoose.connection.on('error', () => {
     process.exit(1);
 });
 
-lcd.on('ready', () => {
-    app.log('LCD READY!!');
-});
-
+// call start display
+reopenDisplay();
+updateDisplay();
 // update display every 10s now
+setInterval(reopenDisplay, 1000 * 60)
 setInterval(updateDisplay, 1000 * 10);
+
+function reopenDisplay() {
+    if(lcd && lcd.close) lcd.close();
+    lcd = require('../lib/lcd.js');
+    
+    lcd.on('ready', () => {
+        app.log('LCD READY!!');
+    });
+}
 
 function updateDisplay() {
     app.log('update display....');
