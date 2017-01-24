@@ -1,7 +1,10 @@
 var app = require('../controller/app.js');
+var cfg = require('../config.json');
 
 var Status = require('../models/status.js');
 var heater = require('../lib/heater.js');
+var cooldownTimer;
+var onTimer;
 
 module.exports = (function() {
     return {
@@ -18,7 +21,7 @@ module.exports = (function() {
         return toggle(false);
     }
 
-    function toggle(state) {
+    function toggleOLD(state) {
         Status.findOne({ 'key': 'heaterOn' }).select('key value').exec((err, oldStatus) => {
             var newSetting = false;
 
@@ -47,5 +50,61 @@ module.exports = (function() {
                 });
             }
         })
+    }
+
+    function toggle(newState, timeout) {
+        Status.findOneAndUpdate({ key: 'heaterOn' }, { value: newState }, { upsert: true }).select('key value').exec((err, oldState) => {
+            app.log('HEATER trying to toggle status...');
+            app.log('HEATER ...old status:', oldState.value);
+
+            if (newState !== (oldState.value === 'true')) {
+                app.log('HEATER ...toggle status! To:', newState);
+
+                if (newState === false) {
+                    // turn off
+                    if (!timeout) {
+                        // without timeout
+                        app.log('HEATER turn OFF heater - clearing cooldown timeout');
+
+                        clearTimeout(cooldownTimer);
+                    } else {
+                        // with timeout
+                        app.log('HEATER starting timer for turning it back on...');
+
+                        cooldownTimer = setTimeout(function() { 
+                            app.log('HEATER ... heater cooled down, turn it on again!');
+
+                            toggle(true, true); 
+                        }, 1000 * 60 * cfg.maxCooldownDuration);
+                    }
+
+                    app.log('HEATER - ACTUALLY turn OFF now');        
+                } else {
+                    // turn on
+                    if (!timeout) {
+                        // without timeout
+                        app.log('HEATER turn ON heater - clearing cooldown timeout');
+
+                        clearTimeout(onTimer);
+                    } else {
+                        // with timeout
+                        app.log('HEATER starting cooldown timer...');
+
+                        clearTimeout(onTimer);
+                        onTimer = setTimeout(function() { 
+                            app.log('HEATER ... heater was on for too long, cooldown turns it off!');
+
+                            toggle(false, true); 
+                        }, 1000 * 60 * cfg.maxOnDuration);
+                    }
+                    
+                    app.log('HEATER - ACTUALLY turn ON now');        
+                }
+
+
+            } else {
+                app.log('HEATER ... nope. Nothing changed.');
+            }
+        });
     }
 })();
