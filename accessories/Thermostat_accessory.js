@@ -10,6 +10,8 @@ var uuid = HAP.uuid;
 var Zone = require('../models/zone.js');
 var Status = require('../models/status.js');
 
+var heater = require('../controller/heater.js');
+
 var thermostat = exports.accessory = new Accessory('Thermostat', uuid.generate('hap-nodejs:accessories:thermostat'));
 
 thermostat.username = "C1:5D:3A:AE:5E:F3";
@@ -33,23 +35,20 @@ thermostat
     .addService(Service.Thermostat, 'Thermostat')
     .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
     .on('get', function(callback) {
-        Status.findOne({ key: 'heaterOn' }).exec((err, data) => {
+        heater.get().then((status) => {
             // return our current value
             var state, stateName;
             
             // shows if the heater is on or off - no cooling for now possible
-            switch(data.value) {
-                case 'false': 
+            switch(status) {
+                case false: 
                     stateName = 'off';
                     state = Characteristic.CurrentHeatingCoolingState.OFF;
                     break;
-                case 'true':
+                case true:
                     stateName = 'heat';
                     state = Characteristic.CurrentHeatingCoolingState.HEAT;
-                    break;
-                default:
-                    stateName = 'off';
-                    state = Characteristic.CurrentHeatingCoolingState.OFF;                
+                    break;             
             }
             
             app.log('get: CurrentHeatingCoolingState', stateName, data.value);

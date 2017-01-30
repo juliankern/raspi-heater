@@ -65,8 +65,9 @@ Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 'auto' }, { new: true, 
 });
 
 // interval checks
-setInterval(checkTemperatures, 1000 * 30); // every 30s
-setInterval(_set, 1000 * 60); // every 1min
+// setInterval(checkTemperatures, 1000 * 30); // every 30s
+// setInterval(_set, 1000 * 60); // every 1min
+setInterval(heater.checkHeaterStatus, 1000 * 60 / 60);
 
 /////////////
 // on kill //
