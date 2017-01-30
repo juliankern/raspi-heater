@@ -18,12 +18,12 @@ function off() {
     return toggle(false);
 }
 
-function get() {
+function get(cb) {
     var heater = false;
     var targetHeater = false;
     var cooldown = false;
     
-    return Status.findOne({}).select('key value').then((statuses) => { console.log('getdatshit', Object.keys(statuses));
+    app.getCurrentStatus((status, data, statuses) => { console.log('getdatshit', Object.keys(statuses));
         if (statuses.heaterOn && statuses.heaterOn.value === 'true') {
             heater = true;
         }
@@ -36,13 +36,13 @@ function get() {
             cooldown = true;
         }
         
-        return { 
+        cb({ 
             heater, 
             targetHeater,
             cooldown, 
             statuses 
-        };
-    }).catch((err) => { throw err; });
+        });
+    });
 }
 
 function toggleOLD(state) {
@@ -96,7 +96,7 @@ function checkHeaterStatus() {
     
     app.log('HEATER checkHeaterStatus');
 
-    get().then((data) => {
+    get((data) => {
         var statuses = data.statuses;
         cooldown = data.cooldown;
         targetHeater = data.targetHeater;
