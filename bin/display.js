@@ -38,6 +38,10 @@ function reopenDisplay() {
     });
 }
 
+function getHeaterOn(statuses) {
+    return (statuses.heaterOn.value === 'true' ? (statuses.cooldownOn.value === 'true' ? '0' : '#') : ' ');
+}
+
 function updateDisplay() {
     app.log('update display....');
     lines = [];
@@ -55,7 +59,7 @@ function updateDisplay() {
             lines.push(
                 zone.currentTemperature.toFixed(1) +
                 'C > ' +
-                zone.targetTemperature.toFixed(1) + 'C  ' + (statuses.heaterOn.value === 'true' ? '#': ' ')
+                zone.targetTemperature.toFixed(1) + 'C  ' + getHeaterOn(statuses)
             );
             
             // put the status in the second line, fill it up with spaces to prevent display bugs - no idea why they keep appearing
