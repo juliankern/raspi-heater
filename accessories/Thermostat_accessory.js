@@ -51,7 +51,7 @@ thermostat
                     break;             
             }
             
-            app.log('get: CurrentHeatingCoolingState', stateName, data.value);
+            app.log('get: CurrentHeatingCoolingState', stateName, status);
             callback(null, state);
         });
     });
