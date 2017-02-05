@@ -40,7 +40,7 @@ thermostat
             var state, stateName;
             
             // shows if the heater is on or off - no cooling for now possible
-            switch(status) {
+            switch(status.heater) {
                 case false: 
                     stateName = 'off';
                     state = Characteristic.CurrentHeatingCoolingState.OFF;
@@ -51,7 +51,7 @@ thermostat
                     break;             
             }
             
-            app.log('get: CurrentHeatingCoolingState', stateName, status);
+            app.log('get: CurrentHeatingCoolingState', stateName, status.heater);
             callback(null, state);
         });
     });
