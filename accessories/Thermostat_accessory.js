@@ -35,7 +35,7 @@ thermostat
     .addService(Service.Thermostat, 'Thermostat')
     .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
     .on('get', function(callback) {
-        heater.get().then((status) => {
+        heater.get((status) => {
             // return our current value
             var state, stateName;
             
