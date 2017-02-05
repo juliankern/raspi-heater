@@ -23,7 +23,7 @@ function get(cb) {
     var targetHeater = false;
     var cooldown = false;
     
-    app.getCurrentStatus((status, data, statuses) => { console.log('getdatshit', Object.keys(statuses));
+    app.getCurrentStatus((status, data, statuses) => {
         if (statuses.heaterOn && statuses.heaterOn.value === 'true') {
             heater = true;
         }
@@ -130,7 +130,13 @@ function checkHeaterStatus() {
                 Status.findOneAndUpdate({ key: 'heaterOn' }, { value: true }, { upsert: true }).exec();
                 heater = true;
             }
-        } 
+        } else {
+            // heater is supposed to be off
+            if (heater) {
+                //...but actually its on :(
+                heater = false;
+            }
+        }
         
         app.log('HEATER checkHeaterStatus - ACTUALLY cooldown:', cooldown);
         app.log('HEATER checkHeaterStatus - ACTUALLY heater:', heater);
