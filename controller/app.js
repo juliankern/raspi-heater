@@ -22,7 +22,7 @@ function getCurrentStatus(cb) {
                 status = 'home';
             }
             
-            _getCurrentConfig(null, statuses.heatingMode, (data) => {
+            _getCurrentConfig(null, statuses.heatingMode).then((data) => {
                 // manual mode may be globally active, but not in this zone
                 // => use the actual status if not
                 // => maybe not the best solution, but the best way for my own heater setup
@@ -115,7 +115,7 @@ function updateTargetTemperature(cb) {
  * @param  {object} now moment.js Obj for setting the current time - if undefined use real now
  * @return {object}     object containing data and the temperature set
  */
-function _getCurrentConfig(now, heatingMode, cb) {
+function _getCurrentConfig(now, heatingMode) {
     now = now || moment();
     var dateArray = [];
     var foundTime;
@@ -159,14 +159,14 @@ function _getCurrentConfig(now, heatingMode, cb) {
     foundIndex = foundIndex === 0 ? dateArray.length : foundIndex;
     foundTime = dateArray[foundIndex - 1];
 
-    Zone.findOne({ number: cfg.zone }).exec((err, zoneData) => {
+    return Zone.findOne({ number: cfg.zone }).then((zoneData) => {
         if (foundTime.manual && now.diff(moment(foundTime.datetime), 'minutes') < cfg.manualModeDuration) {
             // manual mode is not overwritten by config AND not older than config (120min) 
             
-            cb({ 
+            return { 
                 manual: true,
                 temperatures: { manual: zoneData.customTemperature || 20 }
-            });
+            }
         } else if (manualMode) {
             // manualMode tryes to be still active, although it already too old
             // => reset it
@@ -176,12 +176,12 @@ function _getCurrentConfig(now, heatingMode, cb) {
             foundTime = dateArray[foundIndex - 1];
         }
 
-        cb({ 
+        return { 
             day: foundTime.day, 
             dayIndex: foundTime.dayIndex,
             time: foundTime.time, 
             temperatures: _.extend(cfg.defaultTemperatures, foundTime.temperatures) 
-        });
+        }
     })
 
 }
