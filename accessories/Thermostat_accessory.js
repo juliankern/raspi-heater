@@ -1,5 +1,5 @@
 var HAP = require('hap-nodejs');
-var app = require('../lib/global');
+var app = require('../controller/app.js');
 var cfg = require('../config.json');
 
 var Accessory = HAP.Accessory;
