@@ -69,7 +69,7 @@ function updateDisplay() {
             // print those lines to the display
             lcd.clear((err) => {
                 if (err) {
-                    throw err;
+                    app.log('DISPLAY got ERROR while clearing:', err);
                 }
             
                 lcd.printLines(lines).then(() => {
