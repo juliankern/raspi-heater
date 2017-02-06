@@ -80,12 +80,7 @@ function toggle(newState) {
     Status.findOneAndUpdate({ key: 'targetHeaterOn' }, { value: newState }, { upsert: true }).select('key value').exec((err, oldState) => {
         app.log('HEATER trying to toggle status...');
         app.log('HEATER ...old status:', oldState.value || false);
-
-        if (!oldState || newState !== (oldState.value === 'true')) {
-            app.log('HEATER ...toggle status! To:', newState);
-        } else {
-            app.log('HEATER ... nope. Nothing changed.');
-        }
+        app.log('HEATER ...toggle status to:', newState);
     });
 }
 
