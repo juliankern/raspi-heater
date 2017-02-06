@@ -13,7 +13,6 @@ function getCurrentStatus(cb) {
         if (err) { console.error(err); cb(err); } 
         else {
             statuses = _.keyBy(statuses, 'key');
-            log('CONTROL getCurrentStatus', statuses);
 
             if (statuses.isHoliday && statuses.isHoliday.value === 'true') {
                 status = 'holiday';
@@ -31,6 +30,7 @@ function getCurrentStatus(cb) {
                     status = 'manual';
                 }
 
+                clog('CONTROL getCurrentStatus', statuses);
                 clog('CONTROL current status:', status);
                 
                 cb(status, data, statuses); 
