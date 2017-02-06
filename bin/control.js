@@ -60,8 +60,10 @@ gpio.setup(cfg.hardware.button, 'in').then((data) => {
 
 // first check after launch
 Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 'auto' }, { new: true, upsert: true }).exec((err, data) => {
-    checkTemperatures();
-    _set();
+    Status.findOneAndUpdate({ key: 'heaterOn' }, { value: false }, { new: true, upsert: true }).exec((err, data) => {
+        checkTemperatures();
+        _set();
+    }); 
 });
 
 // interval checks
