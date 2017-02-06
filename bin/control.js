@@ -63,6 +63,7 @@ Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 'auto' }, { new: true, 
     Status.findOneAndUpdate({ key: 'heaterOn' }, { value: false }, { new: true, upsert: true }).exec((err, data) => {
         checkTemperatures();
         _set();
+        heater.checkHeaterStatus();
     }); 
 });
 
