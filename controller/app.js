@@ -13,6 +13,7 @@ function getCurrentStatus(cb) {
         if (err) { console.error(err); cb(err); } 
         else {
             statuses = _.keyBy(statuses, 'key');
+            app.log('CONTROL getCurrentStatus', statuses);
 
             if (statuses.isHoliday && statuses.isHoliday.value === 'true') {
                 status = 'holiday';
