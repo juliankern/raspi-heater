@@ -27,7 +27,7 @@ reopenDisplay();
 updateDisplay();
 // update display every 10s now
 setInterval(reopenDisplay, 1000 * 60)
-setInterval(updateDisplay, 1000 * 10);
+setInterval(updateDisplay, 1000 * 31);
 
 function reopenDisplay() {
     if(lcd && lcd.close) lcd.close();
@@ -39,6 +39,7 @@ function reopenDisplay() {
 }
 
 function getHeaterOn(statuses) {
+    app.log('DISPLAY getHeaterOn', status);
     return (statuses.heaterOn.value === 'true' ? (statuses.cooldownOn.value === 'true' ? '0' : '#') : ' ');
 }
 
