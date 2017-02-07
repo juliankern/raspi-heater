@@ -39,8 +39,8 @@ function reopenDisplay() {
 }
 
 function getHeaterOn(statuses) {
-    app.log('DISPLAY getHeaterOn', statuses);
-    return (statuses.heaterOn.value === 'true' ? (statuses.cooldownOn.value === 'true' ? '0' : '#') : ' ');
+    app.log('DISPLAY getHeaterOn', Object.keys(statuses));
+    return (statuses.heaterOn.value === 'true' ? '#' : (statuses.cooldownOn.value === 'true' ? '0' : ' '));
 }
 
 function updateDisplay() {

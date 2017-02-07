@@ -30,7 +30,6 @@ function getCurrentStatus(cb) {
                     status = 'manual';
                 }
 
-                clog('CONTROL getCurrentStatus', statuses);
                 clog('CONTROL current status:', status);
                 
                 cb(status, data, statuses); 
