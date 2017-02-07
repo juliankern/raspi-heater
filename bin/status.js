@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
+var table = require('text-table');
 
 var app = require('../controller/app.js');
 
@@ -19,23 +20,32 @@ mongoose.connection.on('error', () => {
     process.exit(1);
 });
 
+var lines = [];
+
 app.getCurrentStatus((status, data, statuses) => {
+    console.log();
+    console.log('########################');
+    console.log('#### raspi-heater Status');
+    console.log('########################');
+    if (statuses.heaterOn) lines.push([ 'heaterOn', statuses.heaterOn.value, 'since ' + moment(statuses.heaterOn.updatedAt).fromNow(true) ]);
+    if (statuses.targetHeaterOn) lines.push([ 'targetHeaterOn', statuses.targetHeaterOn.value, 'since ' + moment(statuses.targetHeaterOn.updatedAt).fromNow(true) ]);
+    if (statuses.cooldownOn) lines.push([ 'cooldownOn', statuses.cooldownOn.value, 'since ' + moment(statuses.cooldownOn.updatedAt).fromNow(true) ]);
+    if (statuses.heatingMode) lines.push([ 'heatingMode', statuses.heatingMode.value, 'changed ' + moment(statuses.heatingMode.updatedAt).fromNow() ]);
+    console.log(table(lines));
+    lines = [];
     console.log('######################');
-    console.log('raspi-heater Status');
-    console.log('######################');
-    if (statuses.heaterOn) console.log('heaterOn -', statuses.heaterOn.value, '- since', moment(statuses.heaterOn.updatedAt).fromNow(true));
-    if (statuses.targetHeaterOn) console.log('targetHeaterOn -', statuses.targetHeaterOn.value, '- since', moment(statuses.targetHeaterOn.updatedAt).fromNow(true));
-    if (statuses.cooldownOn) console.log('cooldownOn -', statuses.cooldownOn.value, '- since', moment(statuses.cooldownOn.updatedAt).fromNow(true));
-    if (statuses.heatingMode) console.log('heatingMode -', statuses.heatingMode.value, '- changed', moment(statuses.heatingMode.updatedAt).fromNow());
-    console.log('######################');
-    if (statuses.isHome) console.log('isHome - ', statuses.isHome.value);
-    if (statuses.isHoliday) console.log('isHoliday - ', statuses.isHoliday.value);
+    if (statuses.isHome) lines.push([ 'isHome', statuses.isHome.value ]);
+    if (statuses.isHoliday) lines.push([ 'isHoliday', statuses.isHoliday.value ]);
+    console.log(table(lines));
+    lines = [];
     console.log('######################');
     
     Zone.findOne({ number: cfg.zone }).exec((err, zone) => {
-        console.log('current temerature:', zone.currentTemperature.toFixed(1)); 
-        console.log('target temerature:', zone.targetTemperature.toFixed(1)); 
+        lines.push([ 'current temerature:', zone.currentTemperature.toFixed(1) ]); 
+        lines.push([ 'target temerature:', zone.targetTemperature.toFixed(1) ]); 
+        console.log(table(lines));
         console.log('######################');
+        console.log();
         
         process.exit(1);
     });
