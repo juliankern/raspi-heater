@@ -13,7 +13,7 @@
         }
     },
     "maxOnDuration": 30,
-    "maxCooldownDuration": 15,
+    "maxCooldownDuration": 10,
     "manualModeDuration": 120,
     "defaultTemperatures": {
         "home": 20,
