@@ -22,6 +22,8 @@ Right now the software just activates a relay when the temperature gets too low.
 - NodeJS 6 (tested with 6.9.x)
 - MongoDB (tested with 3.4.x)
 - optional:
+-- `forever` a node deamonizer, OR:
+-- `pm2` and avanced process manager, which consumes quite a lot of ressouces (wasn't able to run it on a raspberry 1, you should use `forever` instead
 -- 1602 LCD display module
 
 ## Setup
@@ -37,6 +39,11 @@ Right now the software just activates a relay when the temperature gets too low.
     ```shell
     $ node -v
     v6.9.1
+    ```
+- optionally install `pm2` or `forever` like this:
+    ```shell
+    $ sudo npm install pm2 -g
+    $ sudo npm install forever -g
     ```
 - checkout this repository, probably in `~/raspi-heater/` or `/etc/raspi-heater/`
 - run `npm install` in that directory
@@ -57,6 +64,35 @@ Right now the software just activates a relay when the temperature gets too low.
     - `bin/homekit.js` for homekit support
     - `bin/display.js` if you've connected a display
     - you can start all three with the pm2 process manager with the added process.json
+- if you want to start the processes via a custom `/etc/init.d`-Script, you probably want to install `raspi-heater` into a public location like `/etc/raspi-heater` instead of one users home folder
+    - then you can add the processes to your custom `/etc/init.d`-script (assuming you want to use `forever`):
+        ```shell
+        cd /etc/raspi-heater && sudo forever bin/control.js
+        cd /etc/raspi-heater && sudo forever bin/homekit.js
+        cd /etc/raspi-heater && sudo forever bin/display.js
+        ```
+    - if you want to use `pm2` you can simply add:
+        ```shell
+        cd /etc/raspi-heater && sudo pm2 start process.json
+        ```
+- to check the current status:
+    ```shell
+    $ node bin/status.js
+    ########################
+    #### raspi-heater Status
+    ########################
+    heaterOn        true   since 8 minutes
+    targetHeaterOn  false  since a few seconds
+    cooldownOn      false  since 25 minutes
+    heatingMode     auto   changed 8 minutes ago
+    ######################
+    isHome     true
+    isHoliday  false
+    ######################
+    current temerature:  19.9
+    target temerature:   20.0
+    ######################
+    ```
 
 ## Future features (maybe)
 - browser interface
