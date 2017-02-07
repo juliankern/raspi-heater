@@ -1,3 +1,4 @@
+
 var mongoose = require('mongoose');
 var moment = require('moment');
 var table = require('text-table');
@@ -8,6 +9,7 @@ var Status = require('../models/status.js');
 var Zone = require('../models/zone.js');
 
 require('dotenv').load();
+process.env.LOGGING = false;
 var cfg = require('../config.json');
 
 // set the mongoose promise library to the nodejs one, required by mongoose now
@@ -34,6 +36,7 @@ app.getCurrentStatus((status, data, statuses) => {
     console.log(table(lines));
     lines = [];
     console.log('######################');
+    lines.push([ 'status', status ]);
     if (statuses.isHome) lines.push([ 'isHome', statuses.isHome.value ]);
     if (statuses.isHoliday) lines.push([ 'isHoliday', statuses.isHoliday.value ]);
     console.log(table(lines));
@@ -41,8 +44,8 @@ app.getCurrentStatus((status, data, statuses) => {
     console.log('######################');
     
     Zone.findOne({ number: cfg.zone }).exec((err, zone) => {
-        lines.push([ 'current temerature:', zone.currentTemperature.toFixed(1) ]); 
-        lines.push([ 'target temerature:', zone.targetTemperature.toFixed(1) ]); 
+        lines.push([ 'current temerature:', zone.currentTemperature.toFixed(2) + '°C' ]); 
+        lines.push([ 'target temerature:', zone.targetTemperature.toFixed(2) + '°C' ]); 
         console.log(table(lines));
         console.log('######################');
         console.log();

@@ -57,7 +57,7 @@ function hex2String(input) {
 function clog() {
     var args = Array.prototype.slice.call(arguments);
     args.unshift('[' + moment().format('YYYY-MM-DD HH:mm:ss') + ']');
-    console.log.apply(null, args);  
+    if(process.env.LOGGING !== 'false') console.log.apply(null, args);  
 }
 
 function updateCurrentTemperature(temp, cb) {
