@@ -33,7 +33,7 @@ function getCurrentStatus(cb) {
                 clog('CONTROL current status:', status);
                 
                 cb(status, data, statuses); 
-            });
+            }).catch((err) => { clog('APP caught error', err); });
         }
     });
 }
