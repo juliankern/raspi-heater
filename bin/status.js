@@ -22,6 +22,11 @@ mongoose.connection.on('error', () => {
     process.exit(1);
 });
 
+function onoff(val) {
+    if (typeof val === 'boolean') return val ? 'on' : 'off'; 
+    else return val === 'true' ? 'on' : 'off';
+}
+
 var lines = [];
 
 app.getCurrentStatus((status, data, statuses) => {
@@ -29,9 +34,9 @@ app.getCurrentStatus((status, data, statuses) => {
     console.log('########################');
     console.log('#### raspi-heater Status');
     console.log('########################');
-    if (statuses.heaterOn) lines.push([ 'heaterOn', statuses.heaterOn.value, 'since ' + moment(statuses.heaterOn.updatedAt).fromNow(true) ]);
-    if (statuses.targetHeaterOn) lines.push([ 'targetHeaterOn', statuses.targetHeaterOn.value, 'since ' + moment(statuses.targetHeaterOn.updatedAt).fromNow(true) ]);
-    if (statuses.cooldownOn) lines.push([ 'cooldownOn', statuses.cooldownOn.value, 'since ' + moment(statuses.cooldownOn.updatedAt).fromNow(true) ]);
+    if (statuses.heaterOn) lines.push([ 'heaterOn', onoff(statuses.heaterOn.value), 'since ' + moment(statuses.heaterOn.updatedAt).fromNow(true) ]);
+    if (statuses.targetHeaterOn) lines.push([ 'targetHeaterOn', onoff(statuses.targetHeaterOn.value), 'since ' + moment(statuses.targetHeaterOn.updatedAt).fromNow(true) ]);
+    if (statuses.cooldownOn) lines.push([ 'cooldownOn', onoff(statuses.cooldownOn.value), 'since ' + moment(statuses.cooldownOn.updatedAt).fromNow(true) ]);
     if (statuses.heatingMode) lines.push([ 'heatingMode', statuses.heatingMode.value, 'changed ' + moment(statuses.heatingMode.updatedAt).fromNow() ]);
     console.log(table(lines));
     lines = [];
