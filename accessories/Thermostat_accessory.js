@@ -1,5 +1,5 @@
 var HAP = require('hap-nodejs');
-var app = require('../lib/global');
+var app = require('../controller/app.js');
 var cfg = require('../config.json');
 
 var Accessory = HAP.Accessory;
@@ -9,6 +9,8 @@ var uuid = HAP.uuid;
 
 var Zone = require('../models/zone.js');
 var Status = require('../models/status.js');
+
+var heater = require('../controller/heater.js');
 
 var thermostat = exports.accessory = new Accessory('Thermostat', uuid.generate('hap-nodejs:accessories:thermostat'));
 
@@ -33,27 +35,23 @@ thermostat
     .addService(Service.Thermostat, 'Thermostat')
     .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
     .on('get', function(callback) {
-        Status.findOne({ key: 'heaterOn' }).exec((err, data) => {
+        heater.get((status) => {
             // return our current value
             var state, stateName;
             
-            // maybe i should find a more suitable solution here, but it works for now - it actually shows in homekit if the heater is turned on now
-            // - which isn't that bad, right?
-            switch(data.value) {
-                case 'false': 
+            // shows if the heater is on or off - no cooling for now possible
+            switch(status.heater) {
+                case false: 
                     stateName = 'off';
                     state = Characteristic.CurrentHeatingCoolingState.OFF;
                     break;
-                case 'true':
+                case true:
                     stateName = 'heat';
                     state = Characteristic.CurrentHeatingCoolingState.HEAT;
-                    break;
-                default:
-                    stateName = 'off';
-                    state = Characteristic.CurrentHeatingCoolingState.OFF;                
+                    break;             
             }
             
-            app.log('get: CurrentHeatingCoolingState', stateName, data.value);
+            app.log('get: CurrentHeatingCoolingState', stateName, status.heater);
             callback(null, state);
         });
     });
@@ -69,20 +67,17 @@ thermostat
             
             // same as above, should be changed maybe
             switch(data.value) {
-                case '0': 
-                    stateName = 'off';
+                case 'off': 
                     state = Characteristic.TargetHeatingCoolingState.OFF;
                     break;
-                case '1':
-                    stateName = 'heat';
+                case 'on':
                     state = Characteristic.TargetHeatingCoolingState.HEAT;
                     break;
                 default:
-                    stateName = 'auto';
                     state = Characteristic.TargetHeatingCoolingState.AUTO;                
             }
             
-            app.log('get: TargetHeatingCoolingState', stateName, data.value);
+            app.log('get: TargetHeatingCoolingState', data.value);
             callback(null, state);
         })
     });
@@ -92,18 +87,21 @@ thermostat
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TargetHeatingCoolingState)
     .on('set', function(value, callback) {
+        var state;
         // ignore state "2" which would be "cooling", and set to "auto" instead
-        if (value === 2 || value === '2') value === 3;
+        switch(value) {
+            case Characteristic.TargetHeatingCoolingState.OFF: 
+                state = 'off';
+                break;
+            case Characteristic.TargetHeatingCoolingState.HEAT:
+                state = 'on';
+                break;
+            default:
+                state = 'auto';                
+        }
+
         // save the state
-        Status.findOneAndUpdate({ key: 'heatingMode' }, { value: value }, { new: true, upsert: true }).exec((err, data) => {
-            setTimeout(function() {
-                // reset the state to off after 15 minutes again -> 15 minutes of heating
-                // - the fun part is: we don't need to do more than setting it. the actual changes happens, because this one gets called again - and control.js sees the new status
-                thermostat
-                .getService(Service.Thermostat)
-                .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.OFF);
-            }, 1000 * 60 * 60) // 1h
-            
+        Status.findOneAndUpdate({ key: 'heatingMode' }, { value: state }, { new: true, upsert: true }).exec((err, data) => {
             app.log('set: TargetHeatingCoolingState', value);
             callback();
         })

@@ -1,6 +1,6 @@
 {
   "name": "raspi-heater",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -15,12 +15,13 @@
   "dependencies": {
     "dotenv": "^2.0.0",
     "ds1820-temp": "^1.0.0",
-    "hap-nodejs": "github:khaost/HAP-NodeJS",
+    "hap-nodejs": "^0.4.21",
     "lcd": "^1.1.4",
     "lodash": "^4.16.4",
     "moment": "^2.15.2",
     "mongoose": "^4.6.4",
     "node-persist": "^2.0.7",
-    "rpi-gpio": "^0.7.0"
+    "rpi-gpio": "^0.7.0",
+    "text-table": "^0.2.0"
   }
 }

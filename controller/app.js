@@ -2,7 +2,7 @@ var moment = require('moment');
 var _ = require('lodash');
 var cfg = require('../config.json');
 
-var sensor = require('./sensor');
+var sensor = require('../lib/sensor');
 
 var Status = require('../models/status.js');
 var Zone = require('../models/zone.js');
@@ -22,15 +22,18 @@ function getCurrentStatus(cb) {
                 status = 'home';
             }
             
-            _getCurrentConfig().then((data) => {
-                if (statuses.heatingMode && statuses.heatingMode.value === '1') {
-                    status = 'timer';
+            _getCurrentConfig(null, statuses.heatingMode).then((data) => {
+                // manual mode may be globally active, but not in this zone
+                // => use the actual status if not
+                // => maybe not the best solution, but the best way for my own heater setup
+                if (data.manual && data.temperatures['manual']) {
+                    status = 'manual';
                 }
-                
+
                 clog('CONTROL current status:', status);
                 
                 cb(status, data, statuses); 
-            });
+            }).catch((err) => { clog('APP caught error', err); });
         }
     });
 }
@@ -54,7 +57,7 @@ function hex2String(input) {
 function clog() {
     var args = Array.prototype.slice.call(arguments);
     args.unshift('[' + moment().format('YYYY-MM-DD HH:mm:ss') + ']');
-    console.log.apply(null, args);  
+    if(process.env.LOGGING !== 'false') console.log.apply(null, args);  
 }
 
 function updateCurrentTemperature(temp, cb) {
@@ -112,10 +115,11 @@ function updateTargetTemperature(cb) {
  * @param  {object} now moment.js Obj for setting the current time - if undefined use real now
  * @return {object}     object containing data and the temperature set
  */
-function _getCurrentConfig(now) {
+function _getCurrentConfig(now, heatingMode) {
     now = now || moment();
     var dateArray = [];
     var foundTime;
+    var manualMode = false;
 
     for (let day of cfg.days) {
         for(let time of day.times) {
@@ -130,6 +134,11 @@ function _getCurrentConfig(now) {
     }
 
     dateArray.push({ datetime: now._d, now: true });
+
+    if (heatingMode && heatingMode.value !== 'auto') {
+        manualMode = true;
+        dateArray.push({ on: (heatingMode.value === 'on'), datetime: heatingMode.updatedAt, manual: true });
+    }
 
     dateArray.sort((a, b) => {
         if (moment(a.datetime).unix() > moment(b.datetime).unix()) {
@@ -150,15 +159,31 @@ function _getCurrentConfig(now) {
     foundIndex = foundIndex === 0 ? dateArray.length : foundIndex;
     foundTime = dateArray[foundIndex - 1];
 
-    return Zone.findOne({ number: cfg.zone })
-        .then((data) => {
+    return Zone.findOne({ number: cfg.zone }).then((zoneData) => {
+        if (foundTime.manual && now.diff(moment(foundTime.datetime), 'minutes') < cfg.manualModeDuration) {
+            // manual mode is not overwritten by config AND not older than config (120min) 
+            
             return { 
-                day: foundTime.day, 
-                dayIndex: foundTime.dayIndex,
-                time: foundTime.time, 
-                temperatures: _.extend(cfg.defaults, foundTime.temperatures, { timer: data.customTemperature }) 
-            };
-        });
+                manual: true,
+                temperatures: { manual: zoneData.customTemperature || 20 }
+            }
+        } else if (manualMode) {
+            // manualMode tryes to be still active, although it already too old
+            // => reset it
+            Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 'auto' }, { new: true, upsert: true }).exec();
+
+            foundIndex = foundIndex === 0 ? dateArray.length : foundIndex;
+            foundTime = dateArray[foundIndex - 1];
+        }
+
+        return { 
+            day: foundTime.day, 
+            dayIndex: foundTime.dayIndex,
+            time: foundTime.time, 
+            temperatures: _.extend(cfg.defaultTemperatures, foundTime.temperatures) 
+        }
+    })
+
 }
 
 // exports

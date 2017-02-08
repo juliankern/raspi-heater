@@ -12,7 +12,10 @@
             "data": [5, 6, 17, 18]
         }
     },
-    "defaults": {
+    "maxOnDuration": 30,
+    "maxCooldownDuration": 10,
+    "manualModeDuration": 120,
+    "defaultTemperatures": {
         "home": 20,
         "away": 18,
         "holiday": 17
