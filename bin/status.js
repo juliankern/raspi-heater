@@ -29,11 +29,19 @@ function onoff(val) {
 
 var lines = [];
 
+console.log();
+console.log('########################');
+console.log('#### raspi-heater Status');
+console.log('########################');
+lines.push([ 'zone', cfg.zone ]);
+lines.push([ 'maxOnDuration', cfg.maxOnDuration + ' Minutes' ]);
+lines.push([ 'maxCooldownDuration', cfg.maxCooldownDuration + ' Minutes' ]);
+lines.push([ 'manualModeDuration', cfg.manualModeDuration + ' Minutes' ]);
+console.log(table(lines));
+lines = [];
+console.log('######################');
+
 app.getCurrentStatus((status, data, statuses) => {
-    console.log();
-    console.log('########################');
-    console.log('#### raspi-heater Status');
-    console.log('########################');
     if (statuses.heaterOn) lines.push([ 'heaterOn', onoff(statuses.heaterOn.value), 'since ' + moment(statuses.heaterOn.updatedAt).fromNow(true) ]);
     if (statuses.targetHeaterOn) lines.push([ 'targetHeaterOn', onoff(statuses.targetHeaterOn.value), 'since ' + moment(statuses.targetHeaterOn.updatedAt).fromNow(true) ]);
     if (statuses.cooldownOn) lines.push([ 'cooldownOn', onoff(statuses.cooldownOn.value), 'since ' + moment(statuses.cooldownOn.updatedAt).fromNow(true) ]);
