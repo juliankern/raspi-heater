@@ -37,7 +37,8 @@ homekit.accessories.forEach(function(accessory) {
     accessory.publish({
         port: targetPort++,
         username: accessory.username,
-        pincode: accessory.pincode
+        pincode: accessory.pincode,
+        category: accessory.category || HAP.Accessory.Categories.OTHER
     });
 
     app.log('Accessory published!', accessory.displayName, accessory.pincode)

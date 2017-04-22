@@ -12,26 +12,28 @@ var Status = require('../models/status.js');
 
 var heater = require('../controller/heater.js');
 
-var thermostat = exports.accessory = new Accessory('Thermostat', uuid.generate('hap-nodejs:accessories:thermostat'));
+var accessory = exports.accessory = new Accessory('Thermostat', uuid.generate('hap-nodejs:accessories:thermostat'));
 
-thermostat.username = "C1:5D:3A:AE:5E:F3";
-thermostat.pincode = "031-45-154";
+accessory.username = "C1:5D:3A:AE:5E:F3";
+accessory.pincode = "031-45-154";
+accessory.category = Accessory.Categories.FAN;
+
 
 // set the accessory information to some ultra fancy values
-thermostat
+accessory
     .getService(Service.AccessoryInformation)
     .setCharacteristic(Characteristic.Manufacturer, "Julian Kern")
     .setCharacteristic(Characteristic.Model, "Heater1")
     .setCharacteristic(Characteristic.SerialNumber, "A000000004");
 
-thermostat
+accessory
     .on('identify', (paired, callback) => {
         app.log('Identifying Thermostat - paired:', paired);
         callback();
     }); 
     
 // add a service for getting the current heating state 
-thermostat
+accessory
     .addService(Service.Thermostat, 'Thermostat')
     .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
     .on('get', function(callback) {
@@ -57,7 +59,7 @@ thermostat
     });
 
 // add a service forgetting the supposed heating state
-thermostat
+accessory
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TargetHeatingCoolingState)
     .on('get', function(callback) {
@@ -83,7 +85,7 @@ thermostat
     });
 
 // add a service for changing the target state
-thermostat
+accessory
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TargetHeatingCoolingState)
     .on('set', function(value, callback) {
@@ -110,14 +112,14 @@ thermostat
 // check for the current temperature every 1min, and update homekit
 setInterval(function() {
     Zone.findOne({ number: cfg.zone }).exec((err, data) => {
-        thermostat
+        accessory
             .getService(Service.Thermostat)
             .setCharacteristic(Characteristic.CurrentTemperature, data.currentTemperature);
     });
 }, 1000*60);
 
 // add service for the current temperature
-thermostat
+accessory
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.CurrentTemperature)
     .on('get', function(callback) {
@@ -129,7 +131,7 @@ thermostat
     });
 
 // add service for getting the target temperature
-thermostat
+accessory
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TargetTemperature)
     .on('get', function(callback) {
@@ -141,7 +143,7 @@ thermostat
     });
 
 // add a service for setting the target temperature
-thermostat
+accessory
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TargetTemperature)
     .on('set', function(value, callback) {
@@ -151,7 +153,7 @@ thermostat
             Status.findOneAndUpdate({ key: 'heatingMode' }, { value: 1 }, { new: true, upsert: true }).exec((err, data) => {
                 Zone.findOneAndUpdate({ number: cfg.zone }, { customTemperature: value }).exec((err, data) => {
                     // actually THIS (v) does.
-                    thermostat
+                    accessory
                     .getService(Service.Thermostat)
                     .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.HEAT);
 
@@ -162,7 +164,7 @@ thermostat
     });
 
 // add a "service" for getting the current units => defaults to celsius
-thermostat
+accessory
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TemperatureDisplayUnits)
     .on('get', function(callback) {
@@ -170,7 +172,7 @@ thermostat
     });
 
 // add a service for changing the unit => nope. still celsius.
-thermostat
+accessory
     .getService(Service.Thermostat)
     .getCharacteristic(Characteristic.TemperatureDisplayUnits)
     .on('set', function(value, callback) {

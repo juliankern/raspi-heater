@@ -9,20 +9,21 @@ var err = null; // in case there were any problems
 
 var Status = require('../models/status.js');
 
-var outlet = exports.accessory = new Accessory('Holiday Status', uuid.generate('hap-nodejs:accessories:Outlet'));
+var accessory = exports.accessory = new Accessory('Holiday Status', uuid.generate('hap-nodejs:accessories:Outlet'));
 
-outlet.username = "1A:2B:3C:4D:5D:FA";
-outlet.pincode = "031-45-154";
+accessory.username = "1A:2B:3C:4D:5D:FA";
+accessory.pincode = "031-45-154";
+accessory.category = Accessory.Categories.FAN;
 
 // set the accessory information to some ultra fancy values
-outlet
+accessory
     .getService(Service.AccessoryInformation)
     .setCharacteristic(Characteristic.Manufacturer, "Julian Kern")
     .setCharacteristic(Characteristic.Model, "Heater1")
     .setCharacteristic(Characteristic.SerialNumber, "A000000002");
 
 // add service for setting the status
-outlet
+accessory
     .addService(Service.Outlet, "Holiday Status")
     .getCharacteristic(Characteristic.On)
     .on('set', function(value, callback) {
@@ -34,7 +35,7 @@ outlet
     });
 
 // add service for getting the value
-outlet
+accessory
     .getService(Service.Outlet)
     .getCharacteristic(Characteristic.On)
     .on('get', function(callback) {
@@ -46,6 +47,6 @@ outlet
     }); 
 
 // yep, this "outlet" is always in use. no idea why this is a requirement
-outlet
+accessory
     .getService(Service.Outlet)
     .setCharacteristic(Characteristic.OutletInUse, true);
